@@ -1,4 +1,4 @@
-name: show env vars
+name: Execute Terraform action
 inputs:
   aws_account_id:
     type: string
@@ -51,7 +51,6 @@ runs:
         echo "repo_ref=${{inputs.repo_ref}}"
         echo "terraform_codedir=${{inputs.terraform_codedir}}"
         echo "environment=${{inputs.environment}}"
-
 
     - name: Clone the repository
       uses: actions/checkout/@v4
