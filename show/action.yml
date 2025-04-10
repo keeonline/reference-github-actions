@@ -11,27 +11,31 @@ inputs:
   action:
     type: string
     description: Terraform action
-    required: true
+    required: false
+    default: apply-plan
   repo_owner:
     type: string
     description: Repository enterprise or organisation
-    required: true
+    required: false
+    default: ${{github.repository_owner}}
   repo_name:
     type: string
     description: Repository name
-    required: true
-  work_dir:
+    required: false
+    default: ${{github.event.repository.name}}
+  terraform_codedir:
     type: string
-    description: Repository name
+    description: The directory of the terraform code to be executed
     required: true
   environment:
     type: string
-    description: Infrastructure environment name
+    description: The GitHub environment name
     required: true
-  iac_ref:
+  iac_version:
     type: string
     description: IaC reference for infrastructure environment
-    required: true
+    required: false
+    default: ${{github.ref_name}}
 
 runs:
   using: composite
