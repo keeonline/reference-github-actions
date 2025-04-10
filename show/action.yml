@@ -31,11 +31,6 @@ inputs:
     type: string
     description: The GitHub environment name
     required: true
-  iac_version:
-    type: string
-    description: IaC reference for infrastructure environment
-    required: false
-    default: ${{github.ref_name}}
 
 runs:
   using: composite
