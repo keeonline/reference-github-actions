@@ -3,7 +3,7 @@ name: show env vars
 runs:
 using: composite
 steps:
-  - name: show !!!
+  - name: show
     shell: bash
     run: |
       echo "TF_VAR_environment=${TF_VAR_environment}"
