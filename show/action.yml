@@ -1,11 +1,11 @@
 name: show env vars
 
 runs:
-using: composite
-steps:
-  - name: show
-    shell: bash
-    run: |
-      echo "TF_VAR_environment=${TF_VAR_environment}"
-      echo "TF_VAR_iac_version=${TF_VAR_iac_version}"
-      echo "TF_VAR_infra_environment=${TF_VAR_infra_environment}"
+  using: composite
+  steps:
+    - name: show
+      shell: bash
+      run: |
+        echo "TF_VAR_environment=${TF_VAR_environment}"
+        echo "TF_VAR_iac_version=${TF_VAR_iac_version}"
+        echo "TF_VAR_infra_environment=${TF_VAR_infra_environment}"
