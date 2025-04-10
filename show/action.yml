@@ -1,4 +1,29 @@
 name: show env vars
+inputs:
+  action:
+    type: string
+    description: Terraform action
+    required: true
+  repo_owner:
+    type: string
+    description: Repository enterprise or organisation
+    required: true
+  repo_name:
+    type: string
+    description: Repository name
+    required: true
+  work_dir:
+    type: string
+    description: Repository name
+    required: true
+  environment:
+    type: string
+    description: Infrastructure environment name
+    required: true
+  iac_ref:
+    type: string
+    description: IaC reference for infrastructure environment
+    required: true
 
 runs:
   using: composite
@@ -9,3 +34,46 @@ runs:
         echo "TF_VAR_environment=${TF_VAR_environment}"
         echo "TF_VAR_iac_version=${TF_VAR_iac_version}"
         echo "TF_VAR_infra_environment=${TF_VAR_infra_environment}"
+
+
+    - name: Clone the repository
+      uses: actions/checkout/@v4
+      with:
+        repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
+        sparse-checkout: ${{inputs.work_dir}}
+        ref: ${{inputs.iac_ref}}
+
+    - name: Configure credentials
+      uses: aws-actions/configure-aws-credentials/@v4
+      with:
+        role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_ID}}:role/IaC
+        aws-region: ${{secrets.AWS_REGION}}
+
+    - name: Install Terraform on runner
+      uses: hashicorp/setup-terraform@v3.1.2
+
+    - name: Terraform init
+      working-directory: ${{inputs.work_dir}}
+      run: | 
+        terraform init \
+          -backend-config="bucket=tf-state-bucket-${{secrets.AWS_ACCOUNT_ID}}" \
+          -backend-config="key=${{inputs.environment}}-${{inputs.repo_name}}.tfstate" \
+          -backend-config="region=${{secrets.AWS_REGION}}" \
+          -backend-config="dynamodb_table=terraform-lock" \
+
+    # - name: Conditionally set the planning mode to destroy
+    #   id: planmode
+    #   if: ${{contains(inputs.action,'destroy')}}
+    #   run: echo "value=-destroy" >> $GITHUB_OUTPUT
+
+    # - name: Terraform plan
+    #   working-directory: ${{inputs.work_dir}}
+    #   run: | 
+    #     terraform plan -input=false ${{steps.planmode.outputs.value}}
+
+    # - name: Terraform state change
+    #   working-directory: ${{inputs.work_dir}}
+    #   if: ${{!endsWith(inputs.action,'-plan')}}
+    #   run: | 
+    #     terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
+      
