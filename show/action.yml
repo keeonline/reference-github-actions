@@ -23,6 +23,11 @@ inputs:
     description: Repository name
     required: false
     default: ${{github.event.repository.name}}
+  repo_ref:
+    type: string
+    description: Repository reference
+    required: false
+    default: ${{github.ref_name}}
   terraform_codedir:
     type: string
     description: The directory of the terraform code to be executed
@@ -49,8 +54,8 @@ runs:
       uses: actions/checkout/@v4
       with:
         repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
+        ref: ${{inputs.repo_ref}}
         sparse-checkout: ${{inputs.terraform_codedir}}
-        ref: ${{inputs.iac_ref}}
 
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
