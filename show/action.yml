@@ -51,11 +51,11 @@ runs:
         sparse-checkout: ${{inputs.work_dir}}
         ref: ${{inputs.iac_ref}}
 
-    - name: Configure credentials
-      uses: aws-actions/configure-aws-credentials/@v4
-      with:
-        role-to-assume: arn:aws:iam::${{inputs.aws_account_id}}:role/IaC
-        aws-region: ${{inputs.aws_region}}
+    # - name: Configure credentials
+    #   uses: aws-actions/configure-aws-credentials/@v4
+    #   with:
+    #     role-to-assume: arn:aws:iam::${{inputs.aws_account_id}}:role/IaC
+    #     aws-region: ${{inputs.aws_region}}
 
     - name: Install Terraform on runner
       uses: hashicorp/setup-terraform@v3.1.2
