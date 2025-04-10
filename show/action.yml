@@ -1,5 +1,13 @@
 name: show env vars
 inputs:
+  aws_account_id:
+    type: string
+    description: AWS account ID
+    required: true
+  aws_region:
+    type: string
+    description: AWS region
+    required: true
   action:
     type: string
     description: Terraform action
@@ -46,19 +54,20 @@ runs:
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
       with:
-        role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_ID}}:role/IaC
-        aws-region: ${{secrets.AWS_REGION}}
+        role-to-assume: arn:aws:iam::${{inputs.aws_account_id}}:role/IaC
+        aws-region: ${{inputs.aws_region}}
 
     - name: Install Terraform on runner
       uses: hashicorp/setup-terraform@v3.1.2
 
     - name: Terraform init
+      shell: bash
       working-directory: ${{inputs.work_dir}}
       run: | 
         terraform init \
-          -backend-config="bucket=tf-state-bucket-${{secrets.AWS_ACCOUNT_ID}}" \
+          -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
           -backend-config="key=${{inputs.environment}}-${{inputs.repo_name}}.tfstate" \
-          -backend-config="region=${{secrets.AWS_REGION}}" \
+          -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="dynamodb_table=terraform-lock" \
 
     # - name: Conditionally set the planning mode to destroy
