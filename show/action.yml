@@ -68,7 +68,7 @@ runs:
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${inputs.environment}-${{inputs.repo_name}}.tfstate" \
+          -backend-config="key=${{inputs.environment}}-${{inputs.repo_name}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="dynamodb_table=terraform-lock" \
 
