@@ -40,11 +40,17 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: show
+    - name: Show inputs
       shell: bash
       run: |
         echo "aws_account_id=${{inputs.aws_account_id}}"
         echo "aws_region=${{inputs.aws_region}}"
+        echo "action=${{inputs.action}}"
+        echo "repo_owner=${{inputs.repo_owner}}"
+        echo "repo_name=${{inputs.repo_name}}"
+        echo "repo_ref=${{inputs.repo_ref}}"
+        echo "terraform_codedir=${{inputs.terraform_codedir}}"
+        echo "environment=${{inputs.environment}}"
 
 
     - name: Clone the repository
