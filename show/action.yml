@@ -73,12 +73,14 @@ runs:
           -backend-config="dynamodb_table=terraform-lock" \
 
     - name: Conditionally set the planning mode to destroy
-      id: planmode
       if: ${{contains(inputs.action,'destroy')}}
+      id: planmode
+      shell: bash
       run: echo "value=-destroy" >> $GITHUB_OUTPUT
 
     - name: Terraform plan
       working-directory: ${{inputs.work_dir}}
+      shell: bash
       run: | 
         terraform plan -input=false ${{steps.planmode.outputs.value}}
 
