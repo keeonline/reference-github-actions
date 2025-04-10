@@ -43,9 +43,6 @@ runs:
     - name: show
       shell: bash
       run: |
-        echo "TF_VAR_environment=${TF_VAR_environment}"
-        echo "TF_VAR_iac_version=${TF_VAR_iac_version}"
-        echo "TF_VAR_infra_environment=${TF_VAR_infra_environment}"
         echo "aws_account_id=${{inputs.aws_account_id}}"
         echo "aws_region=${{inputs.aws_region}}"
 
