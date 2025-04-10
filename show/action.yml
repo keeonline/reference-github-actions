@@ -68,7 +68,7 @@ runs:
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${TF_VAR_environment}-${{inputs.repo_name}}.tfstate" \
+          -backend-config="key=${inputs.environment}-${{inputs.repo_name}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="dynamodb_table=terraform-lock" \
 
@@ -84,9 +84,10 @@ runs:
       run: | 
         terraform plan -input=false ${{steps.planmode.outputs.value}}
 
-    # - name: Terraform state change
-    #   working-directory: ${{inputs.work_dir}}
-    #   if: ${{!endsWith(inputs.action,'-plan')}}
-    #   run: | 
-    #     terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
+    - name: Terraform state change
+      if: ${{!endsWith(inputs.action,'-plan')}}
+      working-directory: ${{inputs.work_dir}}
+      shell: bash
+      run: | 
+        terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
       
