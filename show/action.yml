@@ -54,7 +54,7 @@ runs:
       uses: actions/checkout/@v4
       with:
         repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
-        sparse-checkout: ${{inputs.work_dir}}
+        sparse-checkout: ${{inputs.terraform_codedir}}
         ref: ${{inputs.iac_ref}}
 
     - name: Configure credentials
@@ -68,7 +68,7 @@ runs:
 
     - name: Terraform init
       shell: bash
-      working-directory: ${{inputs.work_dir}}
+      working-directory: ${{inputs.terraform_codedir}}
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
@@ -83,14 +83,14 @@ runs:
       run: echo "value=-destroy" >> $GITHUB_OUTPUT
 
     - name: Terraform plan
-      working-directory: ${{inputs.work_dir}}
+      working-directory: ${{inputs.terraform_codedir}}
       shell: bash
       run: | 
         terraform plan -input=false ${{steps.planmode.outputs.value}}
 
     - name: Terraform state change
       if: ${{!endsWith(inputs.action,'-plan')}}
-      working-directory: ${{inputs.work_dir}}
+      working-directory: ${{inputs.terraform_codedir}}
       shell: bash
       run: | 
         terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
