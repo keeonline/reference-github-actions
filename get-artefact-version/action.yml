@@ -3,7 +3,8 @@ inputs:
   branch_name:
     type: string
     description: The branch name from which the artefact is created
-    required: true
+    required: false
+    default: ${{github.ref_name}}
 
 runs:
   using: composite
