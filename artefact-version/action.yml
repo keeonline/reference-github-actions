@@ -22,7 +22,7 @@ runs:
       id: version
       shell: bash
       run: |
-        if [ "${{github.event.ref_name}}" == "main" ]
+        if [ "${{inputs.branch_name}}" == "main" ]
         then
           echo "value=${{steps.semantic.outputs.version_tag}}" >> $GITHUB_OUTPUT
         else
