@@ -5,6 +5,9 @@ inputs:
     description: The branch name from which the artefact is created
     required: false
     default: ${{github.ref_name}}
+outputs:
+  version:
+    value: ${{ steps.version.outputs.value }}
 
 runs:
   using: composite
