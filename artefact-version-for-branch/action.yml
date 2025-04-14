@@ -1,0 +1,30 @@
+name: Get an artefact version for a branch
+inputs:
+  branch_name:
+    type: string
+    description: The branch name for which the artefact version is created
+    required: false
+    default: ${{github.ref_name}}
+outputs:
+  version:
+    value: ${{ steps.version.outputs.value }}
+
+runs:
+  using: composite
+  steps:
+
+    - name: Get the next semantic version for the repo
+      id: semantic
+      uses: paulhatch/semantic-version@5.4.0
+
+    - name: Set the artefact version value
+      id: version
+      shell: bash
+      run: |
+        if [ "${{inputs.branch_name}}" == "main" ]
+        then
+          echo "value=${{steps.semantic.outputs.version_tag}}" >> $GITHUB_OUTPUT
+        else
+          echo "value=${{inputs.branch_name}}-latest" >> $GITHUB_OUTPUT
+        fi
+         

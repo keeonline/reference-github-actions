@@ -12,7 +12,6 @@ outputs:
 runs:
   using: composite
   steps:
-
     - name: Set the artefact version value
       id: version
       shell: bash
