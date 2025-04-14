@@ -1,8 +1,8 @@
-name: Get an artefact version
+name: Get an artefact version for a branch
 inputs:
   branch_name:
     type: string
-    description: The branch name from which the artefact is created
+    description: The branch name for which the artefact version is created
     required: false
     default: ${{github.ref_name}}
 outputs:
@@ -12,12 +12,8 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Show inputs
-      shell: bash
-      run: |
-        echo "branch_name=${{inputs.branch_name}}"
 
-    - name: Get semantic version
+    - name: Get the next semantic version for the repo
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
 
