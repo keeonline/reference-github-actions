@@ -1,0 +1,30 @@
+name: Get the artefact version value(s) from provided reference
+inputs:
+  github_ref:
+    type: string
+    description: The reference from which the artefact is created
+    required: false
+    default: ${{github.ref}}
+outputs:
+  branch:
+    value: ${{ steps.branch_version.outputs.value }}
+  current_semantic:
+    value: ${{ steps.semantic.outputs.previous_version }}
+  next_semantic:
+    value: ${{ steps.semantic.outputs.version_tag }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set the branch version value
+      id: branch_version
+      if: ${{startsWith(inputs.github_ref,'refs/heads')}}
+      shell: bash
+      run: |
+        REF=${{github.ref_name}}
+        echo "value=${REF#refs/heads/}-latest >> $GITHUB_OUTPUT
+
+    - name: Get the semantic version values for the repo
+      id: semantic
+      uses: paulhatch/semantic-version@v5.4.0
+
