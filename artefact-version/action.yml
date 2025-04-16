@@ -16,6 +16,10 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Show inputs
+      shell: bash
+      run: echo "github_ref=${{inputs.github_ref}}"
+
     - name: Set the branch version value
       id: branch_version
       if: ${{startsWith(inputs.github_ref,'refs/heads')}}
