@@ -9,7 +9,7 @@ outputs:
   branch:
     value: ${{ steps.branch_version.outputs.value }}
   current_semantic:
-    value: ${{ steps.semantic.outputs.previous_version }}
+    value: "v${{ steps.semantic.outputs.previous_version }}"
   next_semantic:
     value: ${{ steps.semantic.outputs.version_tag }}
 
