@@ -24,6 +24,11 @@ runs:
         REF=${{github.ref_name}}
         echo "value=${REF#refs/heads/}-latest >> $GITHUB_OUTPUT"
 
+    - name: Checkout sources
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Get the semantic version values for the repo
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
