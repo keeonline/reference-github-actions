@@ -26,7 +26,7 @@ runs:
       shell: bash
       run: |
         REF=${{github.ref_name}}
-        echo "value=${REF#refs/heads/}-latest >> $GITHUB_OUTPUT"
+        echo "value=${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
 
     - name: Checkout sources
       uses: actions/checkout@v4
