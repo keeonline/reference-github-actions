@@ -22,7 +22,7 @@ runs:
       shell: bash
       run: |
         REF=${{github.ref_name}}
-        echo "value=${REF#refs/heads/}-latest >> $GITHUB_OUTPUT
+        echo "value=${REF#refs/heads/}-latest >> $GITHUB_OUTPUT"
 
     - name: Get the semantic version values for the repo
       id: semantic
