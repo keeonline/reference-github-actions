@@ -84,13 +84,13 @@ runs:
       shell: bash
       run: echo "value=-destroy" >> $GITHUB_OUTPUT
 
-    - name: Terraform plan
+    - name: Terraform plan (${{inputs.action}})
       working-directory: ${{inputs.terraform_codedir}}
       shell: bash
       run: | 
         terraform plan -input=false ${{steps.planmode.outputs.value}}
 
-    - name: Terraform state change
+    - name: Terraform state change (${{inputs.action}})
       if: ${{!endsWith(inputs.action,'-plan')}}
       working-directory: ${{inputs.terraform_codedir}}
       shell: bash
