@@ -1,8 +1,8 @@
-name: Get the artefact version value(s) from provided reference
+name: Get artefact version(s) from provided reference
 inputs:
   github_ref:
     type: string
-    description: The reference from which the artefact is created
+    description: The reference from which the artefact version(s) are created
     required: false
     default: ${{github.ref}}
 outputs:
