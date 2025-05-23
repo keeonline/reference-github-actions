@@ -36,7 +36,7 @@ runs:
       if: ${{startsWith(inputs.github_ref,'refs/heads')}}
       shell: bash
       run: |
-        REF=${{github.ref_name}}
+        REF=${{inputs.github_ref}}
         echo "value=${{steps.semantic.outputs.version_tag}}-${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
 
     - name: Set the branch version value
