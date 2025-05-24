@@ -6,12 +6,12 @@ inputs:
     required: false
     default: ${{github.ref}}
 outputs:
-  branch:
-    value: ${{ steps.branch_version.outputs.value }}
   current_semantic:
     value: "v${{ steps.semantic.outputs.previous_version }}"
   next_semantic:
     value: ${{ steps.semantic.outputs.version_tag }}
+  branch_semantic:
+    value: ${{ steps.branch_semantic.outputs.value }}
 
 runs:
   using: composite
@@ -19,14 +19,6 @@ runs:
     - name: Show inputs
       shell: bash
       run: echo "github_ref=${{inputs.github_ref}}"
-
-    - name: Set the branch version value
-      id: branch_version
-      if: ${{startsWith(inputs.github_ref,'refs/heads')}}
-      shell: bash
-      run: |
-        REF=${{github.ref_name}}
-        echo "value=${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
 
     - name: Checkout sources
       uses: actions/checkout@v4
@@ -37,3 +29,10 @@ runs:
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
 
+    - name: Set the branch semantic version value
+      id: branch_semantic
+      if: ${{startsWith(inputs.github_ref,'refs/heads')}}
+      shell: bash
+      run: |
+        REF=${{inputs.github_ref}}
+        echo "value=${{steps.semantic.outputs.version_tag}}-${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
