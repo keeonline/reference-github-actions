@@ -12,8 +12,6 @@ outputs:
     value: ${{ steps.semantic.outputs.version_tag }}
   branch_semantic:
     value: ${{ steps.branch_semantic.outputs.value }}
-  branch:
-    value: ${{ steps.branch.outputs.value }}
 
 runs:
   using: composite
@@ -38,12 +36,3 @@ runs:
       run: |
         REF=${{inputs.github_ref}}
         echo "value=${{steps.semantic.outputs.version_tag}}-${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
-
-    - name: Set the branch version value
-      id: branch
-      if: ${{startsWith(inputs.github_ref,'refs/heads')}}
-      shell: bash
-      run: |
-        REF=${{github.ref_name}}
-        echo "value=${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
-
