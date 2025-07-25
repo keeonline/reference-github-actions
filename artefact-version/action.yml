@@ -27,17 +27,6 @@ runs:
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
 
-    - name: Output hatch values
-      shell: bash
-      run: |
-        echo "version=${{steps.semantic.outputs.version}}"
-        echo "version_tag=${{steps.semantic.outputs.version_tag}}"
-        echo "changed=${{steps.semantic.outputs.changed}}"
-        echo "current_commit=${{steps.semantic.outputs.current_commit}}"
-        echo "previous_commit=${{steps.semantic.outputs.previous_commit}}"
-        echo "previous_commit=${{steps.semantic.outputs.previous_commit}}"
-        echo "previous_version=${{steps.semantic.outputs.previous_version}}"
-
     - name: Set the branch semantic version value
       id: branch
       if: ${{startsWith(inputs.github_ref,'refs/heads')}}

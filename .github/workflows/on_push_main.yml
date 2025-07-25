@@ -1,4 +1,4 @@
-name: Infrastructure code push to main
+name: Proces push to main
 
 on:
   push:
@@ -7,30 +7,23 @@ on:
         
 jobs:
   tag-release:
+      name: On push main
       runs-on: ubuntu-24.04
       permissions:
         contents: write
       steps:
-        - name: salutation
-          run: |
-            echo This is on_push for IaC. branch=${{ github.ref_name }}
-
         - name: Checkout sources
           uses: actions/checkout@v4
           with:
             fetch-depth: 0
 
-        - name: Get semantic version
+        - name: Get semantic versions for repo
           id: version
           uses: paulhatch/semantic-version@v5.4.0
 
-        - name: Tag the repository with the semantic version
-          uses: actions/github-script@v7
+        - name: Tag Repo
+          uses: richardsimko/update-tag@v1.1.6
           with:
-            script: |
-              github.rest.git.createRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: 'refs/tags/${{steps.version.outputs.version_tag}}',
-                sha: context.sha
-              })
+            tag_name: ${{steps.version.outputs.version_tag}}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
