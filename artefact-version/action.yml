@@ -2,23 +2,21 @@ name: Get artefact version(s) from provided reference
 inputs:
   github_ref:
     type: string
-    description: The reference from which the artefact version(s) are created
     required: false
     default: ${{github.ref}}
 outputs:
-  current_semantic:
-    value: "v${{ steps.semantic.outputs.previous_version }}"
-  next_semantic:
-    value: ${{ steps.semantic.outputs.version_tag }}
-  branch_semantic:
-    value: ${{ steps.branch_semantic.outputs.value }}
+  branch:
+    value: ${{steps.branch.outputs.version_tag}}
+  release:
+    value: "${{steps.semantic.outputs.version_tag}}"
 
 runs:
   using: composite
   steps:
     - name: Show inputs
       shell: bash
-      run: echo "github_ref=${{inputs.github_ref}}"
+      run: |
+        echo "github_ref=${{inputs.github_ref}}"
 
     - name: Checkout sources
       uses: actions/checkout@v4
@@ -29,10 +27,21 @@ runs:
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
 
+    - name: Output hatch values
+      shell: bash
+      run: |
+        echo "version=${{steps.semantic.outputs.version}}"
+        echo "version_tag=${{steps.semantic.outputs.version_tag}}"
+        echo "changed=${{steps.semantic.outputs.changed}}"
+        echo "current_commit=${{steps.semantic.outputs.current_commit}}"
+        echo "previous_commit=${{steps.semantic.outputs.previous_commit}}"
+        echo "previous_commit=${{steps.semantic.outputs.previous_commit}}"
+        echo "previous_version=${{steps.semantic.outputs.previous_version}}"
+
     - name: Set the branch semantic version value
-      id: branch_semantic
+      id: branch
       if: ${{startsWith(inputs.github_ref,'refs/heads')}}
       shell: bash
       run: |
         REF=${{inputs.github_ref}}
-        echo "value=${{steps.semantic.outputs.version_tag}}-${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
+        echo "version_tag=${{steps.semantic.outputs.version_tag}}-${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
