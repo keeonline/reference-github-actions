@@ -1,0 +1,16 @@
+name: Test artifact-version
+
+on: 
+    workflow_dispatch:
+
+jobs:
+    greetings:
+        name: Display Greetings
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout sources to make local actions available
+              uses: actions/checkout@v4
+
+            - name: Execute test with selected reference
+              uses: ./actions/artifact-version
+              
