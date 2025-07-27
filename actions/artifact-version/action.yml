@@ -9,6 +9,8 @@ outputs:
     value: ${{steps.branch.outputs.version_tag}}
   release:
     value: "${{steps.semantic.outputs.version_tag}}"
+  projected_release:
+    value: "${{steps.semantic.outputs.changed}}"
 
 runs:
   using: composite
