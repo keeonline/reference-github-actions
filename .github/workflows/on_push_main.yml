@@ -17,13 +17,16 @@ jobs:
           with:
             fetch-depth: 0
 
-        - name: Get semantic versions for repo
+        - name: Checkout sources to make local actions available
+          uses: actions/checkout@v4
+
+        - name: Get next release version for repo
           id: version
-          uses: paulhatch/semantic-version@v5.4.0
+          uses: ./actions/artifact-version
 
         - name: Tag Repo
           uses: richardsimko/update-tag@v1.1.6
           with:
-            tag_name: ${{steps.version.outputs.version_tag}}
+            tag_name: ${{steps.version.outputs.release}}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
