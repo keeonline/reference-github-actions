@@ -20,7 +20,7 @@ jobs:
         - name: Checkout sources to make local actions available
           uses: actions/checkout@v4
 
-        - name: Get versions for selected reference
+        - name: Get next release version for repo
           id: version
           uses: ./actions/artifact-version
 
