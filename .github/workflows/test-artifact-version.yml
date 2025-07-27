@@ -5,12 +5,18 @@ on:
 
 jobs:
     greetings:
-        name: Display Greetings
+        name: Execute test
         runs-on: ubuntu-24.04
         steps:
             - name: Checkout sources to make local actions available
               uses: actions/checkout@v4
 
-            - name: Execute test with selected reference
+            - name: Get versions for selected reference
+              id: version
               uses: ./actions/artifact-version
+
+            - name: Output results
+              run: |
+                echo "branch_semantic=${{steps.version.outputs.branch}}"
+                echo "release_semantic=${{steps.version.outputs.release}}"
               
