@@ -13,29 +13,30 @@ inputs:
     description: Terraform action
     required: false
     default: apply-plan
-  repo_owner:
-    type: string
-    description: Repository enterprise or organisation
-    required: false
-    default: ${{github.repository_owner}}
-  repo_name:
-    type: string
-    description: Repository name
-    required: false
-    default: ${{github.event.repository.name}}
-  repo_ref:
-    type: string
-    description: Repository reference
-    required: false
-    default: ${{github.ref_name}}
-  terraform_codedir:
-    type: string
-    description: The directory of the terraform code to be executed
-    required: true
   environment:
     type: string
     description: The GitHub environment name
     required: true
+  # repo_owner:
+  #   type: string
+  #   description: Repository enterprise or organisation
+  #   required: false
+  #   default: ${{github.repository_owner}}
+  # repo_name:
+  #   type: string
+  #   description: Repository name
+  #   required: false
+  #   default: ${{github.event.repository.name}}
+  # repo_ref:
+  #   type: string
+  #   description: Repository reference
+  #   required: false
+  #   default: ${{github.ref_name}}
+  # codedir:
+  #   type: string
+  #   description: The directory of the terraform code to be executed
+  #   required: false
+  #   default: terraform
 
 runs:
   using: composite
@@ -46,18 +47,18 @@ runs:
         echo "aws_account_id=${{inputs.aws_account_id}}"
         echo "aws_region=${{inputs.aws_region}}"
         echo "action=${{inputs.action}}"
-        echo "repo_owner=${{inputs.repo_owner}}"
-        echo "repo_name=${{inputs.repo_name}}"
-        echo "repo_ref=${{inputs.repo_ref}}"
-        echo "terraform_codedir=${{inputs.terraform_codedir}}"
         echo "environment=${{inputs.environment}}"
+        # echo "repo_owner=${{inputs.repo_owner}}"
+        # echo "repo_name=${{inputs.repo_name}}"
+        # echo "repo_ref=${{inputs.repo_ref}}"
+        # echo "codedir=${{inputs.codedir}}"
 
-    - name: Clone the repository
-      uses: actions/checkout/@v4
-      with:
-        repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
-        ref: ${{inputs.repo_ref}}
-        sparse-checkout: ${{inputs.terraform_codedir}}
+    # - name: Clone the repository
+    #   uses: actions/checkout/@v4
+    #   with:
+    #     repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
+    #     ref: ${{inputs.repo_ref}}
+    #     sparse-checkout: ${{inputs.terraform_codedir}}
 
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
@@ -70,13 +71,14 @@ runs:
 
     - name: Terraform init
       shell: bash
-      working-directory: ${{inputs.terraform_codedir}}
+      # working-directory: ${{inputs.terraform_codedir}}
+      working-directory: terraform
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${{inputs.environment}}-${{inputs.repo_name}}.tfstate" \
+          -backend-config="key=${{inputs.environment}}-${{github.event.repository.name}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
-          -backend-config="dynamodb_table=terraform-lock" \
+          -backend-config="use_lockfile=true" \
 
     - name: Conditionally set the planning mode to destroy
       if: ${{contains(inputs.action,'destroy')}}
@@ -85,14 +87,16 @@ runs:
       run: echo "value=-destroy" >> $GITHUB_OUTPUT
 
     - name: Terraform plan (${{inputs.action}})
-      working-directory: ${{inputs.terraform_codedir}}
+      # working-directory: ${{inputs.terraform_codedir}}
+      working-directory: terraform
       shell: bash
       run: | 
         terraform plan -input=false ${{steps.planmode.outputs.value}}
 
     - name: Terraform state change (${{inputs.action}})
       if: ${{!endsWith(inputs.action,'-plan')}}
-      working-directory: ${{inputs.terraform_codedir}}
+      # working-directory: ${{inputs.terraform_codedir}}
+      working-directory: terraform
       shell: bash
       run: | 
         terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
