@@ -1,22 +1,22 @@
-name: Execute Terraform apply
+name: Execute Terraform command
 inputs:
   aws_account_id:
     type: string
-    description: AWS account ID
     required: true
   aws_region:
     type: string
-    description: AWS region
     required: true
   action:
     type: string
-    description: Terraform action
     required: false
     default: apply-plan
   environment:
     type: string
-    description: The GitHub environment name
     required: true
+  tfdir:
+    type: string
+    required: false
+    default: terraform
   # repo_owner:
   #   type: string
   #   description: Repository enterprise or organisation
@@ -32,11 +32,6 @@ inputs:
   #   description: Repository reference
   #   required: false
   #   default: ${{github.ref_name}}
-  # codedir:
-  #   type: string
-  #   description: The directory of the terraform code to be executed
-  #   required: false
-  #   default: terraform
 
 runs:
   using: composite
@@ -48,17 +43,18 @@ runs:
         echo "aws_region=${{inputs.aws_region}}"
         echo "action=${{inputs.action}}"
         echo "environment=${{inputs.environment}}"
+        echo "tfdir=${{inputs.tfdir}}"
+
         # echo "repo_owner=${{inputs.repo_owner}}"
         # echo "repo_name=${{inputs.repo_name}}"
         # echo "repo_ref=${{inputs.repo_ref}}"
-        # echo "codedir=${{inputs.codedir}}"
 
     # - name: Clone the repository
     #   uses: actions/checkout/@v4
     #   with:
     #     repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
     #     ref: ${{inputs.repo_ref}}
-    #     sparse-checkout: ${{inputs.terraform_codedir}}
+    #     sparse-checkout: ${{inputs.tfdir}}
 
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
@@ -71,8 +67,7 @@ runs:
 
     - name: Terraform init
       shell: bash
-      # working-directory: ${{inputs.terraform_codedir}}
-      working-directory: terraform
+      working-directory: ${{inputs.tfdir}}
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
@@ -87,16 +82,14 @@ runs:
       run: echo "value=-destroy" >> $GITHUB_OUTPUT
 
     - name: Terraform plan (${{inputs.action}})
-      # working-directory: ${{inputs.terraform_codedir}}
-      working-directory: terraform
+      working-directory: ${{inputs.tfdir}}
       shell: bash
       run: | 
         terraform plan -input=false ${{steps.planmode.outputs.value}}
 
     - name: Terraform state change (${{inputs.action}})
       if: ${{!endsWith(inputs.action,'-plan')}}
-      # working-directory: ${{inputs.terraform_codedir}}
-      working-directory: terraform
+      working-directory: ${{inputs.tfdir}}
       shell: bash
       run: | 
         terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
