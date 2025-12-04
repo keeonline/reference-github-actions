@@ -17,6 +17,10 @@ inputs:
     type: string
     required: false
     default: terraform
+  checkout_repo:
+    type: boolean
+    required: false
+    default: false
   repo_name:
     type: string
     required: false
@@ -37,16 +41,17 @@ runs:
         echo "action=${{inputs.action}}"
         echo "environment=${{inputs.environment}}"
         echo "tfdir=${{inputs.tfdir}}"
+        echo "checkout_repo=${{inputs.repo_name}}"
         echo "repo_name=${{inputs.repo_name}}"
         echo "repo_ref=${{inputs.repo_ref}}"
 
     - name: Clone the repository
-      if: ${{ inputs.repo_name != '' && inputs.repo_ref != '' }}
+      if: ${{ inputs.checkout_repo }}
       uses: actions/checkout/@v4
       with:
         repository: ${{inputs.repo_name}}
-        ref: ${{inputs.repo_ref}}
-        sparse-checkout: ${{inputs.tfdir}}
+        ref: ${{steps.repo_ref_name.outputs.value}}
+        sparse-checkout_repo: ${{inputs.tfdir}}
 
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
