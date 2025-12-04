@@ -24,11 +24,11 @@ inputs:
   repo_name:
     type: string
     required: false
-    default: ''
+    default: ${{ github.event.repository.name }}
   repo_ref:
     type: string
     required: false
-    default: ''
+    default: ${{ github.event.ref }}
 
 runs:
   using: composite
@@ -41,7 +41,7 @@ runs:
         echo "action=${{inputs.action}}"
         echo "environment=${{inputs.environment}}"
         echo "tfdir=${{inputs.tfdir}}"
-        echo "checkout_repo=${{inputs.repo_name}}"
+        echo "checkout_repo=${{inputs.checkout_repo}}"
         echo "repo_name=${{inputs.repo_name}}"
         echo "repo_ref=${{inputs.repo_ref}}"
 
@@ -50,7 +50,7 @@ runs:
       uses: actions/checkout/@v4
       with:
         repository: ${{inputs.repo_name}}
-        ref: ${{steps.repo_ref_name.outputs.value}}
+        ref: ${{inputs.repo_ref}}
         sparse-checkout_repo: ${{inputs.tfdir}}
 
     - name: Configure credentials
@@ -62,13 +62,20 @@ runs:
     - name: Install Terraform on runner
       uses: hashicorp/setup-terraform@v3.1.2
 
+    - name: Extract the unqualified repo name
+      id: unqualified_repo_name
+      env:
+        REPO_NAME: ${{inputs.repo_name}}
+      run: |
+        echo "value=${REPO_NAME##*/}" >> $GITHUB_OUTPUT
+
     - name: Terraform init
       shell: bash
       working-directory: ${{inputs.tfdir}}
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${{inputs.environment}}-${{github.event.repository.name}}.tfstate" \
+          -backend-config="key=${{inputs.environment}}-${{steps.unqualified_repo_name.outputs.value}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="use_lockfile=true" \
 
