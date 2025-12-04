@@ -66,6 +66,7 @@ runs:
       id: unqualified_repo_name
       env:
         REPO_NAME: ${{inputs.repo_name}}
+      shell: bash
       run: |
         echo "value=${REPO_NAME##*/}" >> $GITHUB_OUTPUT
 
