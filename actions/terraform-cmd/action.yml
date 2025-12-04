@@ -51,7 +51,7 @@ runs:
       with:
         repository: ${{inputs.repo_name}}
         ref: ${{inputs.repo_ref}}
-        sparse-checkout_repo: ${{inputs.tfdir}}
+        sparse-checkout: ${{inputs.tfdir}}
 
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
