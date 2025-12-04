@@ -24,7 +24,7 @@ inputs:
   repo_name:
     type: string
     required: false
-    default: ${{ github.event.repository.name }}
+    default: ${{ github.repository }}
   repo_ref:
     type: string
     required: false
