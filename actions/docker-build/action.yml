@@ -1,0 +1,35 @@
+name: Build a docker image
+inputs:
+  image:
+    type: string
+    required: true
+  artifact_version:
+    type: string
+    required: false
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - name: Show inputs
+      shell: bash
+      run: |
+        echo "image=${{inputs.image}}"
+        echo "artifact_version=${{inputs.artifact_version}}"
+
+    - name: Build image
+      shell: bash
+      run: |
+        docker build --build-arg VERSION=${{inputs.artifact_version}} \
+                      -t ${{inputs.image}}:${{inputs.artifact_version}} \
+                      .
+
+    - name: List image
+      shell: bash
+      run: |
+        docker image ls ${{inputs.image}}:${{inputs.artifact_version}}
+
+    - name: Inspect image
+      shell: bash
+      run: |
+        docker inspect --type=image ${{inputs.image}}:${{inputs.artifact_version}}
