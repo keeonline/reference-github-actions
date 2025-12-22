@@ -24,11 +24,11 @@ inputs:
   repo_name:
     type: string
     required: false
-    default: ${{ github.repository }}
+    default: ''
   repo_ref:
     type: string
     required: false
-    default: ${{ github.event.ref }}
+    default: ''
 
 runs:
   using: composite
@@ -45,7 +45,8 @@ runs:
         echo "repo_name=${{inputs.repo_name}}"
         echo "repo_ref=${{inputs.repo_ref}}"
 
-    - name: Clone the repository
+    # THIS !!!!!!
+    - name: Conditionally clone the repository
       if: ${{ inputs.checkout_repo }}
       uses: actions/checkout/@v4
       with:
@@ -62,6 +63,7 @@ runs:
     - name: Install Terraform on runner
       uses: hashicorp/setup-terraform@v3.1.2
 
+    # THIS !!!!!
     - name: Extract the unqualified repo name
       id: unqualified_repo_name
       env:
