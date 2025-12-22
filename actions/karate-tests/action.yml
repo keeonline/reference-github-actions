@@ -1,0 +1,54 @@
+name: Run Karate tests
+inputs:
+  karate_version:
+    type: string
+    required: false
+    default: 1.5.1
+  tests_directory:
+    type: string
+    required: false
+    default: .
+  reports_upload_title:
+    type: string
+    required: false
+    default: "Karate Test Reports"
+  baseurl:
+    type: string
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Show inputs
+      shell: bash
+      run: |
+        echo "karate_version=${{inputs.karate_version}}"
+        echo "tests_directory=${{inputs.tests_directory}}"
+        echo "reports_upload_title=${{inputs.reports_upload_title}}"
+
+    - name: Setup karate
+      shell: bash
+      run: |
+        wget -O /opt/karate.jar https://github.com/karatelabs/karate/releases/download/v${{inputs.karate_version}}/karate-${{inputs.karate_version}}.jar
+
+    - name: Conditionally setup base URL property
+      if: ${{ inputs.baseurl != '' }}
+      id: baseurl
+      shell: bash
+      run: |
+        BASEURL=${{inputs.baseurl}}
+        echo "value=-Dbaseurl=${BASEURL}" >> $GITHUB_OUTPUT
+
+    - name: Execute tests
+      working-directory: ${{inputs.tests_directory}}
+      shell: bash
+      run: |
+        java ${{steps.baseurl.outputs.value}} -jar /opt/karate.jar .
+
+    - name: Upload test reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{inputs.reports_upload_title}}
+        path: ${{inputs.tests_directory}}/target/karate-reports
+

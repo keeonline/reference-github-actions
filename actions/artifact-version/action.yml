@@ -1,4 +1,4 @@
-name: Get artifact versions for GitHub reference
+name: Get artifact version
 inputs:
   github_ref:
     type: string
@@ -8,9 +8,9 @@ outputs:
   branch:
     value: ${{steps.branch.outputs.version_tag}}
   release:
-    value: "${{steps.semantic.outputs.version_tag}}"
+    value: ${{steps.semantic.outputs.version_tag}}
   projected_release:
-    value: "${{steps.semantic.outputs.changed}}"
+    value: ${{steps.semantic.outputs.changed}}
 
 runs:
   using: composite
@@ -20,12 +20,12 @@ runs:
       run: |
         echo "github_ref=${{inputs.github_ref}}"
 
-    - name: Checkout sources
+    - name: Checkout repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Get the semantic version values for the repo
+    - name: Get the semantic version values for repo
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
 

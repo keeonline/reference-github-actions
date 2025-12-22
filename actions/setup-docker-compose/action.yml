@@ -1,0 +1,26 @@
+name: Setup Docker Compose
+inputs:
+  version:
+    type: string
+    required: false
+    default: 2.39.1
+
+runs:
+  using: composite
+  steps:
+    - name: Show inputs
+      shell: bash
+      run: |
+        echo "version=${{inputs.version}}"
+
+    - name: Install docker compose
+      shell: bash
+      run: |
+        curl -SL https://github.com/docker/compose/releases/download/v${{inputs.version}}/docker-compose-linux-x86_64 \
+             -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+
+    - name: Verify installation
+      shell: bash
+      run: |
+        docker-compose --version
