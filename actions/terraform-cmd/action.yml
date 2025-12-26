@@ -64,24 +64,21 @@ runs:
       uses: hashicorp/setup-terraform@v3.1.2
 
     # THIS !!!!!
-    # - name: Extract the unqualified repo name
-    #   id: unqualified_repo_name
-    #   env:
-    #     REPO_NAME: ${{inputs.repo_name}}
-    #   shell: bash
-    #   run: |
-    #     echo "value=${REPO_NAME##*/}" >> $GITHUB_OUTPUT
+    - name: Extract the unqualified repo name
+      id: unqualified_repo_name
+      env:
+        REPO_NAME: ${{inputs.repo_name}}
+      shell: bash
+      run: |
+        echo "value=${REPO_NAME##*/}" >> $GITHUB_OUTPUT
 
     - name: Terraform init
       shell: bash
       working-directory: ${{inputs.tfdir}}
-      env:
-        QUALIFIED_REPO_NAME: ${{inputs.repo_name}}
       run: | 
-        REPO_NAME=${QUALIFIED_REPO_NAME##*/}
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${{inputs.environment}}-${{REPO_NAME}}.tfstate" \
+          -backend-config="key=${{inputs.environment}}-${{steps.unqualified_repo_name.outputs.value}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="use_lockfile=true" \
 
