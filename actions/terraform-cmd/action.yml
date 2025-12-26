@@ -81,7 +81,7 @@ runs:
         REPO_NAME=${QUALIFIED_REPO_NAME##*/}
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${{inputs.environment}}-$REPO_NAME.tfstate" \
+          -backend-config="key=${{inputs.environment}}-${{REPO_NAME}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="use_lockfile=true" \
 
