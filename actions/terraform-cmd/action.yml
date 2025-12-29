@@ -17,21 +17,18 @@ inputs:
     type: string
     required: false
     default: terraform
-  # repo_owner:
-  #   type: string
-  #   description: Repository enterprise or organisation
-  #   required: false
-  #   default: ${{github.repository_owner}}
-  # repo_name:
-  #   type: string
-  #   description: Repository name
-  #   required: false
-  #   default: ${{github.event.repository.name}}
-  # repo_ref:
-  #   type: string
-  #   description: Repository reference
-  #   required: false
-  #   default: ${{github.ref_name}}
+  checkout_repo:
+    type: boolean
+    required: false
+    default: false
+  repo_name:
+    type: string
+    required: false
+    default: ''
+  repo_ref:
+    type: string
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -44,17 +41,18 @@ runs:
         echo "action=${{inputs.action}}"
         echo "environment=${{inputs.environment}}"
         echo "tfdir=${{inputs.tfdir}}"
+        echo "checkout_repo=${{inputs.checkout_repo}}"
+        echo "repo_name=${{inputs.repo_name}}"
+        echo "repo_ref=${{inputs.repo_ref}}"
 
-        # echo "repo_owner=${{inputs.repo_owner}}"
-        # echo "repo_name=${{inputs.repo_name}}"
-        # echo "repo_ref=${{inputs.repo_ref}}"
-
-    # - name: Clone the repository
-    #   uses: actions/checkout/@v4
-    #   with:
-    #     repository: ${{inputs.repo_owner}}/${{inputs.repo_name}}
-    #     ref: ${{inputs.repo_ref}}
-    #     sparse-checkout: ${{inputs.tfdir}}
+    # THIS !!!!!!
+    - name: Conditionally clone the repository
+      if: ${{ inputs.checkout_repo }}
+      uses: actions/checkout/@v4
+      with:
+        repository: ${{inputs.repo_name}}
+        ref: ${{inputs.repo_ref}}
+        sparse-checkout: ${{inputs.tfdir}}
 
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials/@v4
@@ -65,13 +63,22 @@ runs:
     - name: Install Terraform on runner
       uses: hashicorp/setup-terraform@v3.1.2
 
+    # THIS !!!!!
+    - name: Extract the unqualified repo name
+      id: unqualified_repo_name
+      env:
+        REPO_NAME: ${{inputs.repo_name}}
+      shell: bash
+      run: |
+        echo "value=${REPO_NAME##*/}" >> $GITHUB_OUTPUT
+
     - name: Terraform init
       shell: bash
       working-directory: ${{inputs.tfdir}}
       run: | 
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
-          -backend-config="key=${{inputs.environment}}-${{github.event.repository.name}}.tfstate" \
+          -backend-config="key=${{inputs.environment}}-${{steps.unqualified_repo_name.outputs.value}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
           -backend-config="use_lockfile=true" \
 
