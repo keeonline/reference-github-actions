@@ -29,9 +29,15 @@ runs:
       id: semantic
       uses: paulhatch/semantic-version@v5.4.0
 
+    - name: Show stuff
+      shell: bash
+      run: |
+        echo "github_ref=${{inputs.github_ref}}"
+        echo "ref_type=${{github.ref_type}}"
+      
     - name: Set the branch reference semantic version value
       id: branch
-      if: ${{startsWith(inputs.github_ref,'refs/heads')}}
+      if: ${{ github.ref_type != 'tag' }}
       shell: bash
       run: |
         REF=${{inputs.github_ref}}
