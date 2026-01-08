@@ -10,7 +10,7 @@ inputs:
     default: ${{github.repository}}
 outputs:
   value:
-    value: ${{steps.semantic.outputs.changed}}
+    value: ${{steps.version.outputs.value}}
   projected_release:
     value: ${{steps.semantic.outputs.changed}}
 
