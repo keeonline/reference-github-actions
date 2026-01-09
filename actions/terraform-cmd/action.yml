@@ -1,4 +1,4 @@
-name: Execute Terraform command
+name: Execute Terraform Command
 inputs:
   aws_account_id:
     type: string
@@ -17,18 +17,19 @@ inputs:
     type: string
     required: false
     default: terraform
-  checkout_repo:
-    type: boolean
-    required: false
-    default: false
+  # checkout_repo:
+  #   type: boolean
+  #   required: false
+  #   default: false
   repo_name:
     type: string
-    required: false
-    default: ''
-  repo_ref:
-    type: string
-    required: false
-    default: ''
+    required: true
+    # required: false
+    # default: ''
+  # repo_ref:
+  #   type: string
+  #   required: false
+  #   default: ''
 
 runs:
   using: composite
@@ -41,21 +42,20 @@ runs:
         echo "action=${{inputs.action}}"
         echo "environment=${{inputs.environment}}"
         echo "tfdir=${{inputs.tfdir}}"
-        echo "checkout_repo=${{inputs.checkout_repo}}"
         echo "repo_name=${{inputs.repo_name}}"
-        echo "repo_ref=${{inputs.repo_ref}}"
+        # echo "repo_ref=${{inputs.repo_ref}}"
+        # echo "checkout_repo=${{inputs.checkout_repo}}"
 
-    # THIS !!!!!!
-    - name: Conditionally clone the repository
-      if: ${{ inputs.checkout_repo }}
-      uses: actions/checkout/@v4
-      with:
-        repository: ${{inputs.repo_name}}
-        ref: ${{inputs.repo_ref}}
-        sparse-checkout: ${{inputs.tfdir}}
+    # - name: Conditionally clone the repository
+    #   if: ${{ inputs.checkout_repo }}
+    #   uses: actions/checkout@v4
+    #   with:
+    #     repository: ${{ inputs.repo_name }}
+    #     ref: ${{ inputs.repo_ref }}
+    #     sparse-checkout: ${{ inputs.tfdir }}
 
     - name: Configure credentials
-      uses: aws-actions/configure-aws-credentials/@v4
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::${{inputs.aws_account_id}}:role/IaC
         aws-region: ${{inputs.aws_region}}
@@ -63,11 +63,10 @@ runs:
     - name: Install Terraform on runner
       uses: hashicorp/setup-terraform@v3.1.2
 
-    # THIS !!!!!
     - name: Extract the unqualified repo name
       id: unqualified_repo_name
       env:
-        REPO_NAME: ${{inputs.repo_name}}
+        REPO_NAME: ${{ inputs.repo_name }}
       shell: bash
       run: |
         echo "value=${REPO_NAME##*/}" >> $GITHUB_OUTPUT
@@ -75,29 +74,28 @@ runs:
     - name: Terraform init
       shell: bash
       working-directory: ${{inputs.tfdir}}
-      run: | 
+      run: |
         terraform init \
           -backend-config="bucket=tf-state-bucket-${{inputs.aws_account_id}}" \
           -backend-config="key=${{inputs.environment}}-${{steps.unqualified_repo_name.outputs.value}}.tfstate" \
           -backend-config="region=${{inputs.aws_region}}" \
-          -backend-config="use_lockfile=true" \
+          -backend-config="use_lockfile=true"
 
-    - name: Conditionally set the planning mode to destroy
+    - name: Conditionally set the planning mode
       if: ${{contains(inputs.action,'destroy')}}
       id: planmode
       shell: bash
       run: echo "value=-destroy" >> $GITHUB_OUTPUT
 
-    - name: Terraform plan (${{inputs.action}})
+    - name: Terraform plan
       working-directory: ${{inputs.tfdir}}
       shell: bash
-      run: | 
-        terraform plan -input=false ${{steps.planmode.outputs.value}}
+      run: |
+        terraform plan -input=false ${{steps.planmode.outputs.value}} 
 
-    - name: Terraform state change (${{inputs.action}})
+    - name: Terrform state change
       if: ${{!endsWith(inputs.action,'-plan')}}
       working-directory: ${{inputs.tfdir}}
       shell: bash
-      run: | 
-        terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}}
-      
+      run: |
+        terraform apply -auto-approve -input=false ${{steps.planmode.outputs.value}} 
