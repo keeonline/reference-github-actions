@@ -21,7 +21,7 @@ runs:
       shell: bash
       run: |
         echo "repo_name=${{inputs.repo_name}}"
-        echo "repo_ref=${{inputs.github_ref}}"
+        echo "repo_ref=${{inputs.repo_ref}}"
 
     - name: Checkout repository
       uses: actions/checkout@v4
