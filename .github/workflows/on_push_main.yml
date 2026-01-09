@@ -31,6 +31,6 @@ jobs:
         - name: Tag Repo
           uses: richardsimko/update-tag@v1.1.6
           with:
-            tag_name: ${{steps.semantic.outputs.version_tag}}
+            tag_name: ${{steps.version.outputs.value}}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
