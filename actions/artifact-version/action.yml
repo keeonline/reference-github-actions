@@ -42,6 +42,9 @@ runs:
         if git show-ref --tags --verify --quiet "refs/tags/${REF}"
         then
           echo "value=${{steps.semantic.outputs.version_tag}}" >> $GITHUB_OUTPUT
-        else
+        elif [ "$REF" == "refs/head/main" ]
+        then 
+          echo "value=${{steps.semantic.outputs.version_tag}}" >> $GITHUB_OUTPUT
+        else 
           echo "value=${{steps.semantic.outputs.version_tag}}-${REF#refs/heads/}-latest" >> $GITHUB_OUTPUT
         fi

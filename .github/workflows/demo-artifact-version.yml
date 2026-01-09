@@ -17,6 +17,6 @@ jobs:
 
             - name: Output results
               run: |
-                echo "branch_semantic=${{steps.version.outputs.value}}"
+                echo "value=${{steps.version.outputs.value}}"
                 echo "projected_release=${{steps.version.outputs.projected_release}}"
               
