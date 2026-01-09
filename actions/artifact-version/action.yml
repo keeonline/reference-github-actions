@@ -39,7 +39,8 @@ runs:
       shell: bash
       run: |
         REF=${{inputs.repo_ref}}
-        if git show-ref --tags --verify --quiet "refs/tags/${REF}"
+        TRIMMED_REF=${REF#refs/tags/}
+        if git show-ref --tags --verify --quiet "refs/tags/${TRIMMED_REF}"
         then
           echo "value=${{steps.semantic.outputs.version_tag}}" >> $GITHUB_OUTPUT
         elif [ "$REF" == "refs/heads/main" ]
