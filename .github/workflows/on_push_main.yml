@@ -12,15 +12,6 @@ jobs:
       permissions:
         contents: write
       steps:
-        # - name: Checkout sources
-        #   uses: actions/checkout@v4
-        #   with:
-        #     fetch-depth: 0
-
-        # - name: Get the semantic version values for repo
-        #   id: semantic
-        #   uses: paulhatch/semantic-version@v5.4.0
-
         - name: Checkout sources to make local actions available
           uses: actions/checkout@v4
 
